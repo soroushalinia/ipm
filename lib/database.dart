@@ -17,8 +17,7 @@ class Project extends Table {
 
 class Operator extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get firstName => text()();
-  TextColumn get lastName => text()();
+  TextColumn get name => text()();
 }
 
 class Task extends Table {

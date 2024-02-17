@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
@@ -17,7 +18,9 @@ class NavDrawer extends StatelessWidget {
           leading: const Icon(
             Icons.account_circle_rounded,
           ),
-          onTap: () {},
+          onTap: () {
+            Get.toNamed('/operator');
+          },
         ),
       ],
     );

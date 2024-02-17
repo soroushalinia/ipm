@@ -6,6 +6,7 @@ import 'package:ipm/components/future_creator.dart';
 import 'package:ipm/components/snackbar.dart';
 import 'package:ipm/database.dart';
 import 'package:drift/drift.dart' as drift;
+import 'package:ipm/pages/operator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,9 @@ class _MyAppState extends State<MyApp> {
         colorSchemeSeed: Colors.blueAccent[300],
         textTheme: GoogleFonts.vazirmatnTextTheme(),
       ),
+      getPages: [
+        GetPage(name: '/operator', page: () => const OperatorPage()),
+      ],
       home: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(

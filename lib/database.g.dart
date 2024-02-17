@@ -187,20 +187,13 @@ class $OperatorTable extends Operator
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _firstNameMeta =
-      const VerificationMeta('firstName');
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
-      'first_name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _lastNameMeta =
-      const VerificationMeta('lastName');
-  @override
-  late final GeneratedColumn<String> lastName = GeneratedColumn<String>(
-      'last_name', aliasedName, false,
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [id, firstName, lastName];
+  List<GeneratedColumn> get $columns => [id, name];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -214,17 +207,11 @@ class $OperatorTable extends Operator
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('first_name')) {
-      context.handle(_firstNameMeta,
-          firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta));
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
-      context.missing(_firstNameMeta);
-    }
-    if (data.containsKey('last_name')) {
-      context.handle(_lastNameMeta,
-          lastName.isAcceptableOrUnknown(data['last_name']!, _lastNameMeta));
-    } else if (isInserting) {
-      context.missing(_lastNameMeta);
+      context.missing(_nameMeta);
     }
     return context;
   }
@@ -237,10 +224,8 @@ class $OperatorTable extends Operator
     return OperatorData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      firstName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}first_name'])!,
-      lastName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}last_name'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
     );
   }
 
@@ -252,24 +237,20 @@ class $OperatorTable extends Operator
 
 class OperatorData extends DataClass implements Insertable<OperatorData> {
   final int id;
-  final String firstName;
-  final String lastName;
-  const OperatorData(
-      {required this.id, required this.firstName, required this.lastName});
+  final String name;
+  const OperatorData({required this.id, required this.name});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['first_name'] = Variable<String>(firstName);
-    map['last_name'] = Variable<String>(lastName);
+    map['name'] = Variable<String>(name);
     return map;
   }
 
   OperatorCompanion toCompanion(bool nullToAbsent) {
     return OperatorCompanion(
       id: Value(id),
-      firstName: Value(firstName),
-      lastName: Value(lastName),
+      name: Value(name),
     );
   }
 
@@ -278,8 +259,7 @@ class OperatorData extends DataClass implements Insertable<OperatorData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return OperatorData(
       id: serializer.fromJson<int>(json['id']),
-      firstName: serializer.fromJson<String>(json['firstName']),
-      lastName: serializer.fromJson<String>(json['lastName']),
+      name: serializer.fromJson<String>(json['name']),
     );
   }
   @override
@@ -287,71 +267,56 @@ class OperatorData extends DataClass implements Insertable<OperatorData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'firstName': serializer.toJson<String>(firstName),
-      'lastName': serializer.toJson<String>(lastName),
+      'name': serializer.toJson<String>(name),
     };
   }
 
-  OperatorData copyWith({int? id, String? firstName, String? lastName}) =>
-      OperatorData(
+  OperatorData copyWith({int? id, String? name}) => OperatorData(
         id: id ?? this.id,
-        firstName: firstName ?? this.firstName,
-        lastName: lastName ?? this.lastName,
+        name: name ?? this.name,
       );
   @override
   String toString() {
     return (StringBuffer('OperatorData(')
           ..write('id: $id, ')
-          ..write('firstName: $firstName, ')
-          ..write('lastName: $lastName')
+          ..write('name: $name')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, firstName, lastName);
+  int get hashCode => Object.hash(id, name);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is OperatorData &&
-          other.id == this.id &&
-          other.firstName == this.firstName &&
-          other.lastName == this.lastName);
+      (other is OperatorData && other.id == this.id && other.name == this.name);
 }
 
 class OperatorCompanion extends UpdateCompanion<OperatorData> {
   final Value<int> id;
-  final Value<String> firstName;
-  final Value<String> lastName;
+  final Value<String> name;
   const OperatorCompanion({
     this.id = const Value.absent(),
-    this.firstName = const Value.absent(),
-    this.lastName = const Value.absent(),
+    this.name = const Value.absent(),
   });
   OperatorCompanion.insert({
     this.id = const Value.absent(),
-    required String firstName,
-    required String lastName,
-  })  : firstName = Value(firstName),
-        lastName = Value(lastName);
+    required String name,
+  }) : name = Value(name);
   static Insertable<OperatorData> custom({
     Expression<int>? id,
-    Expression<String>? firstName,
-    Expression<String>? lastName,
+    Expression<String>? name,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (firstName != null) 'first_name': firstName,
-      if (lastName != null) 'last_name': lastName,
+      if (name != null) 'name': name,
     });
   }
 
-  OperatorCompanion copyWith(
-      {Value<int>? id, Value<String>? firstName, Value<String>? lastName}) {
+  OperatorCompanion copyWith({Value<int>? id, Value<String>? name}) {
     return OperatorCompanion(
       id: id ?? this.id,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
+      name: name ?? this.name,
     );
   }
 
@@ -361,11 +326,8 @@ class OperatorCompanion extends UpdateCompanion<OperatorData> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (firstName.present) {
-      map['first_name'] = Variable<String>(firstName.value);
-    }
-    if (lastName.present) {
-      map['last_name'] = Variable<String>(lastName.value);
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
     }
     return map;
   }
@@ -374,8 +336,7 @@ class OperatorCompanion extends UpdateCompanion<OperatorData> {
   String toString() {
     return (StringBuffer('OperatorCompanion(')
           ..write('id: $id, ')
-          ..write('firstName: $firstName, ')
-          ..write('lastName: $lastName')
+          ..write('name: $name')
           ..write(')'))
         .toString();
   }
