@@ -41,6 +41,7 @@ dependencies:
   drift: ^2.15.0
   sqlite3_flutter_libs: ^0.5.0
   get: ^4.6.6
+  shamsi_date: ^1.0.2
 
 dev_dependencies:
   flutter_test:

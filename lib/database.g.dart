@@ -365,11 +365,21 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES operator (id)'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _schematicIdMeta =
       const VerificationMeta('schematicId');
   @override
   late final GeneratedColumn<String> schematicId = GeneratedColumn<String>(
       'schematic_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _partMeta = const VerificationMeta('part');
+  @override
+  late final GeneratedColumn<String> part = GeneratedColumn<String>(
+      'part', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _durationMeta =
       const VerificationMeta('duration');
@@ -380,8 +390,8 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
   static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
-      'order', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      'order', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _priorityMeta =
       const VerificationMeta('priority');
   @override
@@ -397,25 +407,25 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
   static const VerificationMeta _startMeta = const VerificationMeta('start');
   @override
   late final GeneratedColumn<DateTime> start = GeneratedColumn<DateTime>(
-      'start', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+      'start', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _finishMeta = const VerificationMeta('finish');
   @override
   late final GeneratedColumn<DateTime> finish = GeneratedColumn<DateTime>(
-      'finish', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+      'finish', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _progressMeta =
       const VerificationMeta('progress');
   @override
   late final GeneratedColumn<int> progress = GeneratedColumn<int>(
-      'progress', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      'progress', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _doneMeta = const VerificationMeta('done');
   @override
   late final GeneratedColumn<bool> done = GeneratedColumn<bool>(
-      'done', aliasedName, false,
+      'done', aliasedName, true,
       type: DriftSqlType.bool,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("done" IN (0, 1))'));
   static const VerificationMeta _projectMeta =
@@ -431,7 +441,9 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
   List<GeneratedColumn> get $columns => [
         id,
         operatorName,
+        name,
         schematicId,
+        part,
         duration,
         order,
         priority,
@@ -463,6 +475,12 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
     } else if (isInserting) {
       context.missing(_operatorNameMeta);
     }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
     if (data.containsKey('schematic_id')) {
       context.handle(
           _schematicIdMeta,
@@ -470,6 +488,12 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
               data['schematic_id']!, _schematicIdMeta));
     } else if (isInserting) {
       context.missing(_schematicIdMeta);
+    }
+    if (data.containsKey('part')) {
+      context.handle(
+          _partMeta, part.isAcceptableOrUnknown(data['part']!, _partMeta));
+    } else if (isInserting) {
+      context.missing(_partMeta);
     }
     if (data.containsKey('duration')) {
       context.handle(_durationMeta,
@@ -480,8 +504,6 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
     if (data.containsKey('order')) {
       context.handle(
           _orderMeta, order.isAcceptableOrUnknown(data['order']!, _orderMeta));
-    } else if (isInserting) {
-      context.missing(_orderMeta);
     }
     if (data.containsKey('priority')) {
       context.handle(_priorityMeta,
@@ -500,26 +522,18 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
     if (data.containsKey('start')) {
       context.handle(
           _startMeta, start.isAcceptableOrUnknown(data['start']!, _startMeta));
-    } else if (isInserting) {
-      context.missing(_startMeta);
     }
     if (data.containsKey('finish')) {
       context.handle(_finishMeta,
           finish.isAcceptableOrUnknown(data['finish']!, _finishMeta));
-    } else if (isInserting) {
-      context.missing(_finishMeta);
     }
     if (data.containsKey('progress')) {
       context.handle(_progressMeta,
           progress.isAcceptableOrUnknown(data['progress']!, _progressMeta));
-    } else if (isInserting) {
-      context.missing(_progressMeta);
     }
     if (data.containsKey('done')) {
       context.handle(
           _doneMeta, done.isAcceptableOrUnknown(data['done']!, _doneMeta));
-    } else if (isInserting) {
-      context.missing(_doneMeta);
     }
     if (data.containsKey('project')) {
       context.handle(_projectMeta,
@@ -540,24 +554,28 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       operatorName: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}operator_name'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       schematicId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}schematic_id'])!,
+      part: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}part'])!,
       duration: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}duration'])!,
       order: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}order']),
       priority: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}priority'])!,
       costManHour: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}cost_man_hour'])!,
       start: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}start'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}start']),
       finish: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}finish'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}finish']),
       progress: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}progress'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}progress']),
       done: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}done'])!,
+          .read(DriftSqlType.bool, data['${effectivePrefix}done']),
       project: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}project'])!,
     );
@@ -572,43 +590,59 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
 class TaskData extends DataClass implements Insertable<TaskData> {
   final int id;
   final int operatorName;
+  final String name;
   final String schematicId;
+  final String part;
   final int duration;
-  final int order;
+  final int? order;
   final int priority;
   final int costManHour;
-  final DateTime start;
-  final DateTime finish;
-  final int progress;
-  final bool done;
+  final DateTime? start;
+  final DateTime? finish;
+  final int? progress;
+  final bool? done;
   final int project;
   const TaskData(
       {required this.id,
       required this.operatorName,
+      required this.name,
       required this.schematicId,
+      required this.part,
       required this.duration,
-      required this.order,
+      this.order,
       required this.priority,
       required this.costManHour,
-      required this.start,
-      required this.finish,
-      required this.progress,
-      required this.done,
+      this.start,
+      this.finish,
+      this.progress,
+      this.done,
       required this.project});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['operator_name'] = Variable<int>(operatorName);
+    map['name'] = Variable<String>(name);
     map['schematic_id'] = Variable<String>(schematicId);
+    map['part'] = Variable<String>(part);
     map['duration'] = Variable<int>(duration);
-    map['order'] = Variable<int>(order);
+    if (!nullToAbsent || order != null) {
+      map['order'] = Variable<int>(order);
+    }
     map['priority'] = Variable<int>(priority);
     map['cost_man_hour'] = Variable<int>(costManHour);
-    map['start'] = Variable<DateTime>(start);
-    map['finish'] = Variable<DateTime>(finish);
-    map['progress'] = Variable<int>(progress);
-    map['done'] = Variable<bool>(done);
+    if (!nullToAbsent || start != null) {
+      map['start'] = Variable<DateTime>(start);
+    }
+    if (!nullToAbsent || finish != null) {
+      map['finish'] = Variable<DateTime>(finish);
+    }
+    if (!nullToAbsent || progress != null) {
+      map['progress'] = Variable<int>(progress);
+    }
+    if (!nullToAbsent || done != null) {
+      map['done'] = Variable<bool>(done);
+    }
     map['project'] = Variable<int>(project);
     return map;
   }
@@ -617,15 +651,22 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     return TaskCompanion(
       id: Value(id),
       operatorName: Value(operatorName),
+      name: Value(name),
       schematicId: Value(schematicId),
+      part: Value(part),
       duration: Value(duration),
-      order: Value(order),
+      order:
+          order == null && nullToAbsent ? const Value.absent() : Value(order),
       priority: Value(priority),
       costManHour: Value(costManHour),
-      start: Value(start),
-      finish: Value(finish),
-      progress: Value(progress),
-      done: Value(done),
+      start:
+          start == null && nullToAbsent ? const Value.absent() : Value(start),
+      finish:
+          finish == null && nullToAbsent ? const Value.absent() : Value(finish),
+      progress: progress == null && nullToAbsent
+          ? const Value.absent()
+          : Value(progress),
+      done: done == null && nullToAbsent ? const Value.absent() : Value(done),
       project: Value(project),
     );
   }
@@ -636,15 +677,17 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     return TaskData(
       id: serializer.fromJson<int>(json['id']),
       operatorName: serializer.fromJson<int>(json['operatorName']),
+      name: serializer.fromJson<String>(json['name']),
       schematicId: serializer.fromJson<String>(json['schematicId']),
+      part: serializer.fromJson<String>(json['part']),
       duration: serializer.fromJson<int>(json['duration']),
-      order: serializer.fromJson<int>(json['order']),
+      order: serializer.fromJson<int?>(json['order']),
       priority: serializer.fromJson<int>(json['priority']),
       costManHour: serializer.fromJson<int>(json['costManHour']),
-      start: serializer.fromJson<DateTime>(json['start']),
-      finish: serializer.fromJson<DateTime>(json['finish']),
-      progress: serializer.fromJson<int>(json['progress']),
-      done: serializer.fromJson<bool>(json['done']),
+      start: serializer.fromJson<DateTime?>(json['start']),
+      finish: serializer.fromJson<DateTime?>(json['finish']),
+      progress: serializer.fromJson<int?>(json['progress']),
+      done: serializer.fromJson<bool?>(json['done']),
       project: serializer.fromJson<int>(json['project']),
     );
   }
@@ -654,15 +697,17 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'operatorName': serializer.toJson<int>(operatorName),
+      'name': serializer.toJson<String>(name),
       'schematicId': serializer.toJson<String>(schematicId),
+      'part': serializer.toJson<String>(part),
       'duration': serializer.toJson<int>(duration),
-      'order': serializer.toJson<int>(order),
+      'order': serializer.toJson<int?>(order),
       'priority': serializer.toJson<int>(priority),
       'costManHour': serializer.toJson<int>(costManHour),
-      'start': serializer.toJson<DateTime>(start),
-      'finish': serializer.toJson<DateTime>(finish),
-      'progress': serializer.toJson<int>(progress),
-      'done': serializer.toJson<bool>(done),
+      'start': serializer.toJson<DateTime?>(start),
+      'finish': serializer.toJson<DateTime?>(finish),
+      'progress': serializer.toJson<int?>(progress),
+      'done': serializer.toJson<bool?>(done),
       'project': serializer.toJson<int>(project),
     };
   }
@@ -670,28 +715,32 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   TaskData copyWith(
           {int? id,
           int? operatorName,
+          String? name,
           String? schematicId,
+          String? part,
           int? duration,
-          int? order,
+          Value<int?> order = const Value.absent(),
           int? priority,
           int? costManHour,
-          DateTime? start,
-          DateTime? finish,
-          int? progress,
-          bool? done,
+          Value<DateTime?> start = const Value.absent(),
+          Value<DateTime?> finish = const Value.absent(),
+          Value<int?> progress = const Value.absent(),
+          Value<bool?> done = const Value.absent(),
           int? project}) =>
       TaskData(
         id: id ?? this.id,
         operatorName: operatorName ?? this.operatorName,
+        name: name ?? this.name,
         schematicId: schematicId ?? this.schematicId,
+        part: part ?? this.part,
         duration: duration ?? this.duration,
-        order: order ?? this.order,
+        order: order.present ? order.value : this.order,
         priority: priority ?? this.priority,
         costManHour: costManHour ?? this.costManHour,
-        start: start ?? this.start,
-        finish: finish ?? this.finish,
-        progress: progress ?? this.progress,
-        done: done ?? this.done,
+        start: start.present ? start.value : this.start,
+        finish: finish.present ? finish.value : this.finish,
+        progress: progress.present ? progress.value : this.progress,
+        done: done.present ? done.value : this.done,
         project: project ?? this.project,
       );
   @override
@@ -699,7 +748,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     return (StringBuffer('TaskData(')
           ..write('id: $id, ')
           ..write('operatorName: $operatorName, ')
+          ..write('name: $name, ')
           ..write('schematicId: $schematicId, ')
+          ..write('part: $part, ')
           ..write('duration: $duration, ')
           ..write('order: $order, ')
           ..write('priority: $priority, ')
@@ -714,15 +765,30 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, operatorName, schematicId, duration,
-      order, priority, costManHour, start, finish, progress, done, project);
+  int get hashCode => Object.hash(
+      id,
+      operatorName,
+      name,
+      schematicId,
+      part,
+      duration,
+      order,
+      priority,
+      costManHour,
+      start,
+      finish,
+      progress,
+      done,
+      project);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is TaskData &&
           other.id == this.id &&
           other.operatorName == this.operatorName &&
+          other.name == this.name &&
           other.schematicId == this.schematicId &&
+          other.part == this.part &&
           other.duration == this.duration &&
           other.order == this.order &&
           other.priority == this.priority &&
@@ -737,20 +803,24 @@ class TaskData extends DataClass implements Insertable<TaskData> {
 class TaskCompanion extends UpdateCompanion<TaskData> {
   final Value<int> id;
   final Value<int> operatorName;
+  final Value<String> name;
   final Value<String> schematicId;
+  final Value<String> part;
   final Value<int> duration;
-  final Value<int> order;
+  final Value<int?> order;
   final Value<int> priority;
   final Value<int> costManHour;
-  final Value<DateTime> start;
-  final Value<DateTime> finish;
-  final Value<int> progress;
-  final Value<bool> done;
+  final Value<DateTime?> start;
+  final Value<DateTime?> finish;
+  final Value<int?> progress;
+  final Value<bool?> done;
   final Value<int> project;
   const TaskCompanion({
     this.id = const Value.absent(),
     this.operatorName = const Value.absent(),
+    this.name = const Value.absent(),
     this.schematicId = const Value.absent(),
+    this.part = const Value.absent(),
     this.duration = const Value.absent(),
     this.order = const Value.absent(),
     this.priority = const Value.absent(),
@@ -764,31 +834,32 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
   TaskCompanion.insert({
     this.id = const Value.absent(),
     required int operatorName,
+    required String name,
     required String schematicId,
+    required String part,
     required int duration,
-    required int order,
+    this.order = const Value.absent(),
     required int priority,
     required int costManHour,
-    required DateTime start,
-    required DateTime finish,
-    required int progress,
-    required bool done,
+    this.start = const Value.absent(),
+    this.finish = const Value.absent(),
+    this.progress = const Value.absent(),
+    this.done = const Value.absent(),
     required int project,
   })  : operatorName = Value(operatorName),
+        name = Value(name),
         schematicId = Value(schematicId),
+        part = Value(part),
         duration = Value(duration),
-        order = Value(order),
         priority = Value(priority),
         costManHour = Value(costManHour),
-        start = Value(start),
-        finish = Value(finish),
-        progress = Value(progress),
-        done = Value(done),
         project = Value(project);
   static Insertable<TaskData> custom({
     Expression<int>? id,
     Expression<int>? operatorName,
+    Expression<String>? name,
     Expression<String>? schematicId,
+    Expression<String>? part,
     Expression<int>? duration,
     Expression<int>? order,
     Expression<int>? priority,
@@ -802,7 +873,9 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (operatorName != null) 'operator_name': operatorName,
+      if (name != null) 'name': name,
       if (schematicId != null) 'schematic_id': schematicId,
+      if (part != null) 'part': part,
       if (duration != null) 'duration': duration,
       if (order != null) 'order': order,
       if (priority != null) 'priority': priority,
@@ -818,20 +891,24 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
   TaskCompanion copyWith(
       {Value<int>? id,
       Value<int>? operatorName,
+      Value<String>? name,
       Value<String>? schematicId,
+      Value<String>? part,
       Value<int>? duration,
-      Value<int>? order,
+      Value<int?>? order,
       Value<int>? priority,
       Value<int>? costManHour,
-      Value<DateTime>? start,
-      Value<DateTime>? finish,
-      Value<int>? progress,
-      Value<bool>? done,
+      Value<DateTime?>? start,
+      Value<DateTime?>? finish,
+      Value<int?>? progress,
+      Value<bool?>? done,
       Value<int>? project}) {
     return TaskCompanion(
       id: id ?? this.id,
       operatorName: operatorName ?? this.operatorName,
+      name: name ?? this.name,
       schematicId: schematicId ?? this.schematicId,
+      part: part ?? this.part,
       duration: duration ?? this.duration,
       order: order ?? this.order,
       priority: priority ?? this.priority,
@@ -853,8 +930,14 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     if (operatorName.present) {
       map['operator_name'] = Variable<int>(operatorName.value);
     }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
     if (schematicId.present) {
       map['schematic_id'] = Variable<String>(schematicId.value);
+    }
+    if (part.present) {
+      map['part'] = Variable<String>(part.value);
     }
     if (duration.present) {
       map['duration'] = Variable<int>(duration.value);
@@ -891,7 +974,9 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     return (StringBuffer('TaskCompanion(')
           ..write('id: $id, ')
           ..write('operatorName: $operatorName, ')
+          ..write('name: $name, ')
           ..write('schematicId: $schematicId, ')
+          ..write('part: $part, ')
           ..write('duration: $duration, ')
           ..write('order: $order, ')
           ..write('priority: $priority, ')

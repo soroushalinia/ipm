@@ -6,7 +6,11 @@ import 'package:ipm/components/future_creator.dart';
 import 'package:ipm/components/snackbar.dart';
 import 'package:ipm/database.dart';
 import 'package:drift/drift.dart' as drift;
+import 'package:ipm/pages/add_task.dart';
 import 'package:ipm/pages/operator.dart';
+import 'package:ipm/pages/task_detail.dart';
+import 'package:ipm/pages/tasks.dart';
+import 'package:ipm/pages/update.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,9 +35,26 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.light,
         colorSchemeSeed: Colors.blueAccent[300],
         textTheme: GoogleFonts.vazirmatnTextTheme(),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(
+              Colors.blue[300],
+            ),
+            textStyle: const MaterialStatePropertyAll(
+              TextStyle(color: Colors.red),
+            ),
+            overlayColor: MaterialStatePropertyAll(
+              Colors.blue[600],
+            ),
+          ),
+        ),
       ),
       getPages: [
         GetPage(name: '/operator', page: () => const OperatorPage()),
+        GetPage(name: '/tasks', page: () => const TaskView()),
+        GetPage(name: '/add_task', page: () => const AddTaskView()),
+        GetPage(name: "/update", page: () => const UpdatePage()),
+        GetPage(name: "/detail", page: () => const TaskDetail())
       ],
       home: Directionality(
         textDirection: TextDirection.rtl,
@@ -99,7 +120,7 @@ class _MyAppState extends State<MyApp> {
                                     Get.back();
                                     // ignore: use_build_context_synchronously
                                     successSnackbar(
-                                        context, "تغییرات ذخیره شد  ");
+                                        context, "تغییرات ذخیره شد");
                                     setState(() {});
                                   }
                                 },

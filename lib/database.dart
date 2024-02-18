@@ -23,15 +23,17 @@ class Operator extends Table {
 class Task extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get operatorName => integer().references(Operator, #id)();
+  TextColumn get name => text()();
   TextColumn get schematicId => text()();
+  TextColumn get part => text()();
   IntColumn get duration => integer()();
-  IntColumn get order => integer()();
+  IntColumn get order => integer().nullable()();
   IntColumn get priority => integer()();
   IntColumn get costManHour => integer()();
-  DateTimeColumn get start => dateTime()();
-  DateTimeColumn get finish => dateTime()();
-  IntColumn get progress => integer()();
-  BoolColumn get done => boolean()();
+  DateTimeColumn get start => dateTime().nullable()();
+  DateTimeColumn get finish => dateTime().nullable()();
+  IntColumn get progress => integer().nullable()();
+  BoolColumn get done => boolean().nullable()();
   IntColumn get project => integer().references(Project, #id)();
 }
 
