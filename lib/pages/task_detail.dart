@@ -68,6 +68,7 @@ class _TaskDetailState extends State<TaskDetail> {
 
             return SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ListTile(
                     title: const Text("پروژه"),
@@ -126,23 +127,24 @@ class _TaskDetailState extends State<TaskDetail> {
                     leading: const Icon(Icons.done),
                   ),
                   const Divider(),
-                  Text("برچسب ها"),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: task.tags.split(",").length,
-                          itemBuilder: (context, index) {
-                            return Tag(
-                              text: task.tags.split(",")[index],
-                              color: Colors.purple[400],
-                            );
-                          },
-                        ),
-                      )
-                    ],
+                  const Padding(
+                    padding: EdgeInsets.only(right: 28),
+                    child: Text(
+                      "برچسب ها",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  ListView.builder(
+                    padding: const EdgeInsets.all(24),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: task.tags.split(",").length,
+                    itemBuilder: (context, index) {
+                      return Tag(
+                        text: task.tags.split(",")[index],
+                        color: Colors.purple[400],
+                      );
+                    },
                   )
                 ],
               ),

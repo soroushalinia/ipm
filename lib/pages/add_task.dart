@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ipm/components/auto_complete.dart';
@@ -7,7 +5,6 @@ import 'package:ipm/components/future_creator.dart';
 import 'package:ipm/components/snackbar.dart';
 import 'package:ipm/database.dart';
 import 'package:drift/drift.dart' as drift;
-import 'package:file_picker/file_picker.dart';
 
 class AddTaskView extends StatefulWidget {
   const AddTaskView({super.key});
