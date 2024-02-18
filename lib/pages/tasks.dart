@@ -51,14 +51,20 @@ class _TaskViewState extends State<TaskView> {
                     itemCount: snapshot.data["tasks"].length,
                     itemBuilder: (BuildContext context, int index) {
                       final task = snapshot.data["tasks"][index];
-                      final projectName = snapshot.data["projects"]
+                      String operatorName = "undefined";
+                      String projectName = "undefined";
+
+                      final projects = snapshot.data["projects"]
                           .where((e) => e.id == task.project)
-                          .toList()[0]
-                          .name;
-                      final operatorName = snapshot.data["operators"]
+                          .toList();
+                      final operators = snapshot.data["operators"]
                           .where((e) => e.id == task.operatorName)
-                          .toList()[0]
-                          .name;
+                          .toList();
+                      if (projects.length > 0 && operators.length > 0) {
+                        operatorName = operators[0].name;
+                        projectName = projects[0].name;
+                      }
+
                       return ListTile(
                         title: Text(
                             "${task.name}: (پروژه: $projectName) [$operatorName]"),
@@ -202,6 +208,7 @@ class _TaskViewState extends State<TaskView> {
                                             ..where((tbl) =>
                                                 tbl.id.equals(task.id));
                                           await stream.go();
+                                          setState(() {});
                                           Get.back();
                                           // ignore: use_build_context_synchronously
                                           successSnackbar(context, "حذف شد");

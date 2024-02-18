@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ipm/components/future_creator.dart';
+import 'package:ipm/components/tags.dart';
 import 'package:ipm/database.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
@@ -124,6 +125,25 @@ class _TaskDetailState extends State<TaskDetail> {
                     subtitle: Text(task.done ? "انجام شده" : "انجام نشده"),
                     leading: const Icon(Icons.done),
                   ),
+                  const Divider(),
+                  Text("برچسب ها"),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: task.tags.split(",").length,
+                          itemBuilder: (context, index) {
+                            return Tag(
+                              text: task.tags.split(",")[index],
+                              color: Colors.purple[400],
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  )
                 ],
               ),
             );

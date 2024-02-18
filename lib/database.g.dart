@@ -392,6 +392,11 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
       'order', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumn<String> tags = GeneratedColumn<String>(
+      'tags', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _priorityMeta =
       const VerificationMeta('priority');
   @override
@@ -437,6 +442,12 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES project (id)'));
+  static const VerificationMeta _attachmentMeta =
+      const VerificationMeta('attachment');
+  @override
+  late final GeneratedColumn<Uint8List> attachment = GeneratedColumn<Uint8List>(
+      'attachment', aliasedName, true,
+      type: DriftSqlType.blob, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -446,13 +457,15 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
         part,
         duration,
         order,
+        tags,
         priority,
         costManHour,
         start,
         finish,
         progress,
         done,
-        project
+        project,
+        attachment
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -505,6 +518,12 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
       context.handle(
           _orderMeta, order.isAcceptableOrUnknown(data['order']!, _orderMeta));
     }
+    if (data.containsKey('tags')) {
+      context.handle(
+          _tagsMeta, tags.isAcceptableOrUnknown(data['tags']!, _tagsMeta));
+    } else if (isInserting) {
+      context.missing(_tagsMeta);
+    }
     if (data.containsKey('priority')) {
       context.handle(_priorityMeta,
           priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta));
@@ -541,6 +560,12 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
     } else if (isInserting) {
       context.missing(_projectMeta);
     }
+    if (data.containsKey('attachment')) {
+      context.handle(
+          _attachmentMeta,
+          attachment.isAcceptableOrUnknown(
+              data['attachment']!, _attachmentMeta));
+    }
     return context;
   }
 
@@ -564,6 +589,8 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
           .read(DriftSqlType.int, data['${effectivePrefix}duration'])!,
       order: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}order']),
+      tags: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tags'])!,
       priority: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}priority'])!,
       costManHour: attachedDatabase.typeMapping
@@ -578,6 +605,8 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
           .read(DriftSqlType.bool, data['${effectivePrefix}done']),
       project: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}project'])!,
+      attachment: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}attachment']),
     );
   }
 
@@ -595,6 +624,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final String part;
   final int duration;
   final int? order;
+  final String tags;
   final int priority;
   final int costManHour;
   final DateTime? start;
@@ -602,6 +632,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final int? progress;
   final bool? done;
   final int project;
+  final Uint8List? attachment;
   const TaskData(
       {required this.id,
       required this.operatorName,
@@ -610,13 +641,15 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       required this.part,
       required this.duration,
       this.order,
+      required this.tags,
       required this.priority,
       required this.costManHour,
       this.start,
       this.finish,
       this.progress,
       this.done,
-      required this.project});
+      required this.project,
+      this.attachment});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -629,6 +662,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     if (!nullToAbsent || order != null) {
       map['order'] = Variable<int>(order);
     }
+    map['tags'] = Variable<String>(tags);
     map['priority'] = Variable<int>(priority);
     map['cost_man_hour'] = Variable<int>(costManHour);
     if (!nullToAbsent || start != null) {
@@ -644,6 +678,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       map['done'] = Variable<bool>(done);
     }
     map['project'] = Variable<int>(project);
+    if (!nullToAbsent || attachment != null) {
+      map['attachment'] = Variable<Uint8List>(attachment);
+    }
     return map;
   }
 
@@ -657,6 +694,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       duration: Value(duration),
       order:
           order == null && nullToAbsent ? const Value.absent() : Value(order),
+      tags: Value(tags),
       priority: Value(priority),
       costManHour: Value(costManHour),
       start:
@@ -668,6 +706,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           : Value(progress),
       done: done == null && nullToAbsent ? const Value.absent() : Value(done),
       project: Value(project),
+      attachment: attachment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(attachment),
     );
   }
 
@@ -682,6 +723,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       part: serializer.fromJson<String>(json['part']),
       duration: serializer.fromJson<int>(json['duration']),
       order: serializer.fromJson<int?>(json['order']),
+      tags: serializer.fromJson<String>(json['tags']),
       priority: serializer.fromJson<int>(json['priority']),
       costManHour: serializer.fromJson<int>(json['costManHour']),
       start: serializer.fromJson<DateTime?>(json['start']),
@@ -689,6 +731,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       progress: serializer.fromJson<int?>(json['progress']),
       done: serializer.fromJson<bool?>(json['done']),
       project: serializer.fromJson<int>(json['project']),
+      attachment: serializer.fromJson<Uint8List?>(json['attachment']),
     );
   }
   @override
@@ -702,6 +745,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'part': serializer.toJson<String>(part),
       'duration': serializer.toJson<int>(duration),
       'order': serializer.toJson<int?>(order),
+      'tags': serializer.toJson<String>(tags),
       'priority': serializer.toJson<int>(priority),
       'costManHour': serializer.toJson<int>(costManHour),
       'start': serializer.toJson<DateTime?>(start),
@@ -709,6 +753,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'progress': serializer.toJson<int?>(progress),
       'done': serializer.toJson<bool?>(done),
       'project': serializer.toJson<int>(project),
+      'attachment': serializer.toJson<Uint8List?>(attachment),
     };
   }
 
@@ -720,13 +765,15 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           String? part,
           int? duration,
           Value<int?> order = const Value.absent(),
+          String? tags,
           int? priority,
           int? costManHour,
           Value<DateTime?> start = const Value.absent(),
           Value<DateTime?> finish = const Value.absent(),
           Value<int?> progress = const Value.absent(),
           Value<bool?> done = const Value.absent(),
-          int? project}) =>
+          int? project,
+          Value<Uint8List?> attachment = const Value.absent()}) =>
       TaskData(
         id: id ?? this.id,
         operatorName: operatorName ?? this.operatorName,
@@ -735,6 +782,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
         part: part ?? this.part,
         duration: duration ?? this.duration,
         order: order.present ? order.value : this.order,
+        tags: tags ?? this.tags,
         priority: priority ?? this.priority,
         costManHour: costManHour ?? this.costManHour,
         start: start.present ? start.value : this.start,
@@ -742,6 +790,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
         progress: progress.present ? progress.value : this.progress,
         done: done.present ? done.value : this.done,
         project: project ?? this.project,
+        attachment: attachment.present ? attachment.value : this.attachment,
       );
   @override
   String toString() {
@@ -753,13 +802,15 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('part: $part, ')
           ..write('duration: $duration, ')
           ..write('order: $order, ')
+          ..write('tags: $tags, ')
           ..write('priority: $priority, ')
           ..write('costManHour: $costManHour, ')
           ..write('start: $start, ')
           ..write('finish: $finish, ')
           ..write('progress: $progress, ')
           ..write('done: $done, ')
-          ..write('project: $project')
+          ..write('project: $project, ')
+          ..write('attachment: $attachment')
           ..write(')'))
         .toString();
   }
@@ -773,13 +824,15 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       part,
       duration,
       order,
+      tags,
       priority,
       costManHour,
       start,
       finish,
       progress,
       done,
-      project);
+      project,
+      $driftBlobEquality.hash(attachment));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -791,13 +844,15 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.part == this.part &&
           other.duration == this.duration &&
           other.order == this.order &&
+          other.tags == this.tags &&
           other.priority == this.priority &&
           other.costManHour == this.costManHour &&
           other.start == this.start &&
           other.finish == this.finish &&
           other.progress == this.progress &&
           other.done == this.done &&
-          other.project == this.project);
+          other.project == this.project &&
+          $driftBlobEquality.equals(other.attachment, this.attachment));
 }
 
 class TaskCompanion extends UpdateCompanion<TaskData> {
@@ -808,6 +863,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
   final Value<String> part;
   final Value<int> duration;
   final Value<int?> order;
+  final Value<String> tags;
   final Value<int> priority;
   final Value<int> costManHour;
   final Value<DateTime?> start;
@@ -815,6 +871,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
   final Value<int?> progress;
   final Value<bool?> done;
   final Value<int> project;
+  final Value<Uint8List?> attachment;
   const TaskCompanion({
     this.id = const Value.absent(),
     this.operatorName = const Value.absent(),
@@ -823,6 +880,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     this.part = const Value.absent(),
     this.duration = const Value.absent(),
     this.order = const Value.absent(),
+    this.tags = const Value.absent(),
     this.priority = const Value.absent(),
     this.costManHour = const Value.absent(),
     this.start = const Value.absent(),
@@ -830,6 +888,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     this.progress = const Value.absent(),
     this.done = const Value.absent(),
     this.project = const Value.absent(),
+    this.attachment = const Value.absent(),
   });
   TaskCompanion.insert({
     this.id = const Value.absent(),
@@ -839,6 +898,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     required String part,
     required int duration,
     this.order = const Value.absent(),
+    required String tags,
     required int priority,
     required int costManHour,
     this.start = const Value.absent(),
@@ -846,11 +906,13 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     this.progress = const Value.absent(),
     this.done = const Value.absent(),
     required int project,
+    this.attachment = const Value.absent(),
   })  : operatorName = Value(operatorName),
         name = Value(name),
         schematicId = Value(schematicId),
         part = Value(part),
         duration = Value(duration),
+        tags = Value(tags),
         priority = Value(priority),
         costManHour = Value(costManHour),
         project = Value(project);
@@ -862,6 +924,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     Expression<String>? part,
     Expression<int>? duration,
     Expression<int>? order,
+    Expression<String>? tags,
     Expression<int>? priority,
     Expression<int>? costManHour,
     Expression<DateTime>? start,
@@ -869,6 +932,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     Expression<int>? progress,
     Expression<bool>? done,
     Expression<int>? project,
+    Expression<Uint8List>? attachment,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -878,6 +942,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       if (part != null) 'part': part,
       if (duration != null) 'duration': duration,
       if (order != null) 'order': order,
+      if (tags != null) 'tags': tags,
       if (priority != null) 'priority': priority,
       if (costManHour != null) 'cost_man_hour': costManHour,
       if (start != null) 'start': start,
@@ -885,6 +950,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       if (progress != null) 'progress': progress,
       if (done != null) 'done': done,
       if (project != null) 'project': project,
+      if (attachment != null) 'attachment': attachment,
     });
   }
 
@@ -896,13 +962,15 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       Value<String>? part,
       Value<int>? duration,
       Value<int?>? order,
+      Value<String>? tags,
       Value<int>? priority,
       Value<int>? costManHour,
       Value<DateTime?>? start,
       Value<DateTime?>? finish,
       Value<int?>? progress,
       Value<bool?>? done,
-      Value<int>? project}) {
+      Value<int>? project,
+      Value<Uint8List?>? attachment}) {
     return TaskCompanion(
       id: id ?? this.id,
       operatorName: operatorName ?? this.operatorName,
@@ -911,6 +979,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       part: part ?? this.part,
       duration: duration ?? this.duration,
       order: order ?? this.order,
+      tags: tags ?? this.tags,
       priority: priority ?? this.priority,
       costManHour: costManHour ?? this.costManHour,
       start: start ?? this.start,
@@ -918,6 +987,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       progress: progress ?? this.progress,
       done: done ?? this.done,
       project: project ?? this.project,
+      attachment: attachment ?? this.attachment,
     );
   }
 
@@ -945,6 +1015,9 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     if (order.present) {
       map['order'] = Variable<int>(order.value);
     }
+    if (tags.present) {
+      map['tags'] = Variable<String>(tags.value);
+    }
     if (priority.present) {
       map['priority'] = Variable<int>(priority.value);
     }
@@ -966,6 +1039,9 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     if (project.present) {
       map['project'] = Variable<int>(project.value);
     }
+    if (attachment.present) {
+      map['attachment'] = Variable<Uint8List>(attachment.value);
+    }
     return map;
   }
 
@@ -979,13 +1055,15 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
           ..write('part: $part, ')
           ..write('duration: $duration, ')
           ..write('order: $order, ')
+          ..write('tags: $tags, ')
           ..write('priority: $priority, ')
           ..write('costManHour: $costManHour, ')
           ..write('start: $start, ')
           ..write('finish: $finish, ')
           ..write('progress: $progress, ')
           ..write('done: $done, ')
-          ..write('project: $project')
+          ..write('project: $project, ')
+          ..write('attachment: $attachment')
           ..write(')'))
         .toString();
   }

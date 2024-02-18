@@ -110,6 +110,7 @@ class _OperatorPageState extends State<OperatorPage> {
                                 var stream = db.delete(db.operator)
                                   ..where((tbl) => tbl.id.equals(operator.id));
                                 await stream.go();
+                                setState(() {});
                                 Get.toNamed('/operator');
                                 // ignore: use_build_context_synchronously
                                 successSnackbar(context, "حذف شد");

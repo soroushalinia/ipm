@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ipm/components/auto_complete.dart';
@@ -5,6 +7,7 @@ import 'package:ipm/components/future_creator.dart';
 import 'package:ipm/components/snackbar.dart';
 import 'package:ipm/database.dart';
 import 'package:drift/drift.dart' as drift;
+import 'package:file_picker/file_picker.dart';
 
 class AddTaskView extends StatefulWidget {
   const AddTaskView({super.key});
@@ -22,6 +25,9 @@ class _AddTaskViewState extends State<AddTaskView> {
   final TextEditingController durationController = TextEditingController();
   final TextEditingController priorityController = TextEditingController();
   final TextEditingController manHourController = TextEditingController();
+  final TextEditingController tagController = TextEditingController();
+
+  List<String> tagList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +43,8 @@ class _AddTaskViewState extends State<AddTaskView> {
       durationController.text = "${taskEdit.duration}";
       priorityController.text = "${taskEdit.priority}";
       manHourController.text = "${taskEdit.costManHour}";
+      tagList = taskEdit.split(",");
+      // if (fileName == nul)
     }
 
     return Directionality(
@@ -141,6 +149,75 @@ class _AddTaskViewState extends State<AddTaskView> {
                         ),
                       ),
                     ),
+                    const Divider(),
+                    const Text("برچسب ها"),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              tagList.add(tagController.text);
+                            });
+                          },
+                          icon: const Icon(Icons.add),
+                        ),
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              controller: tagController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "برچسب جدید",
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: tagList.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            width: 250,
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: Colors.purple[600],
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  tagList[index],
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        tagController.text = "";
+                                        tagList.removeAt(index);
+                                      },
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                     const Padding(
                       padding: EdgeInsets.all(50.0),
                     ),
@@ -207,6 +284,7 @@ class _AddTaskViewState extends State<AddTaskView> {
                             order: drift.Value(latestOrder),
                             done: const drift.Value(false),
                             progress: const drift.Value(0),
+                            tags: drift.Value(tagList.join(",")),
                           ),
                         );
                     Get.toNamed('/tasks');
@@ -226,6 +304,7 @@ class _AddTaskViewState extends State<AddTaskView> {
                         duration: drift.Value(duration),
                         priority: drift.Value(priority),
                         costManHour: drift.Value(manHour),
+                        tags: drift.Value(tagList.join(",")),
                         done: const drift.Value(false),
                       ),
                     );

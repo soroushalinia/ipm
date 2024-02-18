@@ -28,6 +28,7 @@ class Task extends Table {
   TextColumn get part => text()();
   IntColumn get duration => integer()();
   IntColumn get order => integer().nullable()();
+  TextColumn get tags => text()();
   IntColumn get priority => integer()();
   IntColumn get costManHour => integer()();
   DateTimeColumn get start => dateTime().nullable()();
@@ -35,6 +36,7 @@ class Task extends Table {
   IntColumn get progress => integer().nullable()();
   BoolColumn get done => boolean().nullable()();
   IntColumn get project => integer().references(Project, #id)();
+  BlobColumn get attachment => blob().nullable()();
 }
 
 class Delay extends Table {
