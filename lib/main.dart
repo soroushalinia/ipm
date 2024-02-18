@@ -9,6 +9,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:ipm/pages/add_task.dart';
 import 'package:ipm/pages/operator.dart';
 import 'package:ipm/pages/operator_tasks.dart';
+import 'package:ipm/pages/project_report.dart';
 import 'package:ipm/pages/task_detail.dart';
 import 'package:ipm/pages/tasks.dart';
 import 'package:ipm/pages/update.dart';
@@ -56,7 +57,8 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: '/add_task', page: () => const AddTaskView()),
         GetPage(name: "/update", page: () => const UpdatePage()),
         GetPage(name: "/detail", page: () => const TaskDetail()),
-        GetPage(name: "/operator_tasks", page: () => const OperatorTaskView())
+        GetPage(name: "/operator_tasks", page: () => const OperatorTaskView()),
+        GetPage(name: "/project_report", page: () => const ProjectReport())
       ],
       home: Directionality(
         textDirection: TextDirection.rtl,
@@ -133,44 +135,60 @@ class _MyAppState extends State<MyApp> {
                         ),
                       );
                     },
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red[600],
-                      ),
-                      // color: Colors.red,
-                      onPressed: () {
-                        Get.defaultDialog(
-                          title: "حدف",
-                          content: const Text(
-                              "!آبا از حذف اطمینان دارید؟ این عمل غیر قابل بازگشت بوده و تمامی اقلام مربوطه حذف خواهند شد"),
-                          actions: [
-                            ElevatedButton(
-                                onPressed: () async {
-                                  final db = Get.find<AppDatabase>();
-                                  var stream = db.delete(db.project)
-                                    ..where((tbl) => tbl.id.equals(project.id));
-                                  await stream.go();
-                                  Get.back();
-                                  // ignore: use_build_context_synchronously
-                                  successSnackbar(context, "حذف شد");
-                                  setState(() {});
-                                },
-                                child: Text(
-                                  "حذف",
-                                  style: TextStyle(
-                                    color: Colors.red[400],
-                                  ),
-                                )),
-                            ElevatedButton(
-                              onPressed: () {
-                                Get.back();
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Get.toNamed(
+                              "/project_report",
+                              arguments: {
+                                "projectId": project.id,
                               },
-                              child: const Text("لغو"),
-                            ),
-                          ],
-                        );
-                      },
+                            );
+                          },
+                          icon: const Icon(Icons.description_rounded),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red[600],
+                          ),
+                          onPressed: () {
+                            Get.defaultDialog(
+                              title: "حدف",
+                              content: const Text(
+                                  "!آبا از حذف اطمینان دارید؟ این عمل غیر قابل بازگشت بوده و تمامی اقلام مربوطه حذف خواهند شد"),
+                              actions: [
+                                ElevatedButton(
+                                    onPressed: () async {
+                                      final db = Get.find<AppDatabase>();
+                                      var stream = db.delete(db.project)
+                                        ..where(
+                                            (tbl) => tbl.id.equals(project.id));
+                                      await stream.go();
+                                      Get.back();
+                                      // ignore: use_build_context_synchronously
+                                      successSnackbar(context, "حذف شد");
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "حذف",
+                                      style: TextStyle(
+                                        color: Colors.red[400],
+                                      ),
+                                    )),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  child: const Text("لغو"),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   );
                 },
