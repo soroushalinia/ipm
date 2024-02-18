@@ -371,6 +371,10 @@ class _AddTaskViewState extends State<AddTaskView> {
                     successSnackbar(context, "فعالیت ایجاد شد");
                     setState(() {});
                   } else {
+                    if (Get.arguments["task"].progress > duration) {
+                      errorSnackbar("مدت فعلی از پیشرفت پروژه کمتر است");
+                      return;
+                    }
                     var stream = db.update(db.task)
                       ..where((tbl) => tbl.id.equals(Get.arguments["task"].id));
                     await stream.write(
@@ -386,6 +390,25 @@ class _AddTaskViewState extends State<AddTaskView> {
                         tags: drift.Value(tagList.join(",")),
                       ),
                     );
+                    if (Get.arguments["task"].progress == duration) {
+                      var stream = db.update(db.task)
+                        ..where(
+                            (tbl) => tbl.id.equals(Get.arguments["task"].id));
+                      await stream.write(
+                        const TaskCompanion(
+                          done: drift.Value(true),
+                        ),
+                      );
+                    } else {
+                      var stream = db.update(db.task)
+                        ..where(
+                            (tbl) => tbl.id.equals(Get.arguments["task"].id));
+                      await stream.write(
+                        const TaskCompanion(
+                          done: drift.Value(false),
+                        ),
+                      );
+                    }
                     setState(() {});
                     Get.toNamed('/tasks');
                     // ignore: use_build_context_synchronously

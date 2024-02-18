@@ -280,7 +280,7 @@ class _UpdatePageState extends State<UpdatePage> {
                   return;
                 }
                 var done = false;
-                if (task.progress == task.duration) {
+                if (progress == task.duration) {
                   done = true;
                 }
                 await stream.write(
