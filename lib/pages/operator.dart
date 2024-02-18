@@ -92,45 +92,58 @@ class _OperatorPageState extends State<OperatorPage> {
                       ),
                     );
                   },
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.delete,
-                      color: Colors.red[600],
-                    ),
-                    // color: Colors.red,
-                    onPressed: () {
-                      Get.defaultDialog(
-                        title: "حدف",
-                        content: const Text(
-                            "!آبا از حذف اطمینان دارید؟ این عمل غیر قابل بازگشت بوده و تمامی اقلام مربوطه حذف خواهند شد"),
-                        actions: [
-                          ElevatedButton(
-                              onPressed: () async {
-                                final db = Get.find<AppDatabase>();
-                                var stream = db.delete(db.operator)
-                                  ..where((tbl) => tbl.id.equals(operator.id));
-                                await stream.go();
-                                setState(() {});
-                                Get.toNamed('/operator');
-                                // ignore: use_build_context_synchronously
-                                successSnackbar(context, "حذف شد");
-                                setState(() {});
-                              },
-                              child: Text(
-                                "حذف",
-                                style: TextStyle(
-                                  color: Colors.red[400],
-                                ),
-                              )),
-                          ElevatedButton(
-                            onPressed: () {
-                              Get.toNamed('/operator');
-                            },
-                            child: const Text("لغو"),
-                          ),
-                        ],
-                      );
-                    },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Get.toNamed("/operator_tasks",
+                              arguments: {"operator": operator});
+                        },
+                        icon: const Icon(Icons.description_rounded),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.red[600],
+                        ),
+                        // color: Colors.red,
+                        onPressed: () {
+                          Get.defaultDialog(
+                            title: "حدف",
+                            content: const Text(
+                                "!آبا از حذف اطمینان دارید؟ این عمل غیر قابل بازگشت بوده و تمامی اقلام مربوطه حذف خواهند شد"),
+                            actions: [
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    final db = Get.find<AppDatabase>();
+                                    var stream = db.delete(db.operator)
+                                      ..where(
+                                          (tbl) => tbl.id.equals(operator.id));
+                                    await stream.go();
+                                    setState(() {});
+                                    Get.toNamed('/operator');
+                                    // ignore: use_build_context_synchronously
+                                    successSnackbar(context, "حذف شد");
+                                    setState(() {});
+                                  },
+                                  child: Text(
+                                    "حذف",
+                                    style: TextStyle(
+                                      color: Colors.red[400],
+                                    ),
+                                  )),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Get.toNamed('/operator');
+                                },
+                                child: const Text("لغو"),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 );
               },

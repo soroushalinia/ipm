@@ -1,38 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ipm/components/drawer.dart';
 import 'package:ipm/components/future_creator.dart';
 import 'package:ipm/components/snackbar.dart';
 import 'package:ipm/components/tags.dart';
 import 'package:ipm/database.dart';
 import 'package:drift/drift.dart' as drift;
 
-class TaskView extends StatefulWidget {
-  const TaskView({super.key});
+class OperatorTaskView extends StatefulWidget {
+  const OperatorTaskView({super.key});
 
   @override
-  State<TaskView> createState() => _TaskViewState();
+  State<OperatorTaskView> createState() => _OperatorTaskViewState();
 }
 
-class _TaskViewState extends State<TaskView> {
+class _OperatorTaskViewState extends State<OperatorTaskView> {
   String searchQuery = "";
-  bool operatorFilter = true;
+  final operator = Get.arguments["operator"];
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        drawer: const NavDrawer(),
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Get.back();
+            },
+          ),
           backgroundColor: Colors.blue[300],
-          title: const Text(
-            "فعالیت ها",
+          title: Text(
+            "گزارش: ${operator.name}",
           ),
         ),
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(24.0),
               child: TextField(
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -40,9 +44,11 @@ class _TaskViewState extends State<TaskView> {
                   hintText: 'جستجو',
                 ),
                 onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
+                  setState(
+                    () {
+                      searchQuery = value;
+                    },
+                  );
                 },
               ),
             ),
@@ -51,18 +57,20 @@ class _TaskViewState extends State<TaskView> {
               var operators = await db.select(db.operator).get();
               var projects = await db.select(db.project).get();
               var tasks = await db.select(db.task).get();
-              tasks.sort((a, b) => a.order! - b.order!);
+              var operatorTasks =
+                  tasks.where((e) => e.operatorName == operator.id).toList();
+              operatorTasks.sort((a, b) => a.operatorOrder - b.operatorOrder);
               if (searchQuery == "") {
                 return {
                   "operators": operators,
                   "projects": projects,
-                  "tasks": tasks,
+                  "tasks": operatorTasks,
                 };
               } else {
                 return {
                   "operators": operators,
                   "projects": projects,
-                  "tasks": tasks
+                  "tasks": operatorTasks
                       .where((element) => element.name.contains(searchQuery))
                       .toList(),
                 };
@@ -153,11 +161,12 @@ class _TaskViewState extends State<TaskView> {
                                 IconButton(
                                   onPressed: () async {
                                     final db = Get.find<AppDatabase>();
-                                    final currentOrder = task.order;
-                                    final newOrder = task.order - 1;
+                                    final currentOrder = task.operatorOrder;
+                                    final newOrder = task.operatorOrder - 1;
                                     var tasks = await db.select(db.task).get();
-                                    var orderTasks =
-                                        tasks.map((e) => e.order!).toList();
+                                    var orderTasks = tasks
+                                        .map((e) => e.operatorOrder)
+                                        .toList();
 
                                     var latestOrder = orderTasks.fold(
                                             1,
@@ -171,11 +180,12 @@ class _TaskViewState extends State<TaskView> {
                                         newOrder >= 1) {
                                       var stream = db.update(db.task)
                                         ..where((tbl) =>
-                                            tbl.order.equals(newOrder));
+                                            tbl.operatorOrder.equals(newOrder));
 
                                       await stream.write(
                                         TaskCompanion(
-                                          order: drift.Value(currentOrder),
+                                          operatorOrder:
+                                              drift.Value(currentOrder),
                                         ),
                                       );
 
@@ -197,11 +207,12 @@ class _TaskViewState extends State<TaskView> {
                                 IconButton(
                                   onPressed: () async {
                                     final db = Get.find<AppDatabase>();
-                                    final currentOrder = task.order;
-                                    final newOrder = task.order + 1;
+                                    final currentOrder = task.operatorOrder;
+                                    final newOrder = task.operatorOrder + 1;
                                     var tasks = await db.select(db.task).get();
-                                    var orderTasks =
-                                        tasks.map((e) => e.order!).toList();
+                                    var orderTasks = tasks
+                                        .map((e) => e.operatorOrder)
+                                        .toList();
 
                                     var latestOrder = orderTasks.fold(
                                         1,
@@ -213,11 +224,12 @@ class _TaskViewState extends State<TaskView> {
                                         newOrder >= 1) {
                                       var stream = db.update(db.task)
                                         ..where((tbl) =>
-                                            tbl.order.equals(newOrder));
+                                            tbl.operatorOrder.equals(newOrder));
 
                                       await stream.write(
                                         TaskCompanion(
-                                          order: drift.Value(currentOrder),
+                                          operatorOrder:
+                                              drift.Value(currentOrder),
                                         ),
                                       );
 
@@ -227,7 +239,7 @@ class _TaskViewState extends State<TaskView> {
 
                                       await taskStream.write(
                                         TaskCompanion(
-                                          order: drift.Value(newOrder),
+                                          operatorOrder: drift.Value(newOrder),
                                         ),
                                       );
 

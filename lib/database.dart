@@ -28,6 +28,7 @@ class Task extends Table {
   TextColumn get part => text()();
   IntColumn get duration => integer()();
   IntColumn get order => integer().nullable()();
+  IntColumn get operatorOrder => integer()();
   TextColumn get tags => text()();
   IntColumn get priority => integer()();
   IntColumn get costManHour => integer()();

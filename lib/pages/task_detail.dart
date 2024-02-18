@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ipm/components/future_creator.dart';
-import 'package:ipm/components/tags.dart';
 import 'package:ipm/database.dart';
 import 'package:shamsi_date/shamsi_date.dart';
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 
 class TaskDetail extends StatefulWidget {
   const TaskDetail({super.key});
@@ -16,6 +17,7 @@ class _TaskDetailState extends State<TaskDetail> {
   final task = Get.arguments["task"];
   @override
   Widget build(BuildContext context) {
+    final List<String> tags = task.tags.split(",").toList();
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -134,18 +136,38 @@ class _TaskDetailState extends State<TaskDetail> {
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
-                  ListView.builder(
-                    padding: const EdgeInsets.all(24),
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: task.tags.split(",").length,
-                    itemBuilder: (context, index) {
-                      return Tag(
-                        text: task.tags.split(",")[index],
-                        color: Colors.purple[400],
-                      );
-                    },
-                  )
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Row(
+                      children: tags.mapIndexed((index, element) {
+                        if (element != "") {
+                          return Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  element,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }).toList(),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                  ),
                 ],
               ),
             );

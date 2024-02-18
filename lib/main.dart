@@ -8,6 +8,7 @@ import 'package:ipm/database.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:ipm/pages/add_task.dart';
 import 'package:ipm/pages/operator.dart';
+import 'package:ipm/pages/operator_tasks.dart';
 import 'package:ipm/pages/task_detail.dart';
 import 'package:ipm/pages/tasks.dart';
 import 'package:ipm/pages/update.dart';
@@ -54,7 +55,8 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: '/tasks', page: () => const TaskView()),
         GetPage(name: '/add_task', page: () => const AddTaskView()),
         GetPage(name: "/update", page: () => const UpdatePage()),
-        GetPage(name: "/detail", page: () => const TaskDetail())
+        GetPage(name: "/detail", page: () => const TaskDetail()),
+        GetPage(name: "/operator_tasks", page: () => const OperatorTaskView())
       ],
       home: Directionality(
         textDirection: TextDirection.rtl,

@@ -279,8 +279,15 @@ class _UpdatePageState extends State<UpdatePage> {
 
                   return;
                 }
+                var done = false;
+                if (task.progress == task.duration) {
+                  done = true;
+                }
                 await stream.write(
-                  TaskCompanion(progress: drift.Value(progress)),
+                  TaskCompanion(
+                    progress: drift.Value(progress),
+                    done: drift.Value(done),
+                  ),
                 );
               }
             }

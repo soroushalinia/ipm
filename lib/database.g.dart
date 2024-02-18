@@ -392,6 +392,12 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
       'order', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _operatorOrderMeta =
+      const VerificationMeta('operatorOrder');
+  @override
+  late final GeneratedColumn<int> operatorOrder = GeneratedColumn<int>(
+      'operator_order', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
   @override
   late final GeneratedColumn<String> tags = GeneratedColumn<String>(
@@ -457,6 +463,7 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
         part,
         duration,
         order,
+        operatorOrder,
         tags,
         priority,
         costManHour,
@@ -517,6 +524,14 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
     if (data.containsKey('order')) {
       context.handle(
           _orderMeta, order.isAcceptableOrUnknown(data['order']!, _orderMeta));
+    }
+    if (data.containsKey('operator_order')) {
+      context.handle(
+          _operatorOrderMeta,
+          operatorOrder.isAcceptableOrUnknown(
+              data['operator_order']!, _operatorOrderMeta));
+    } else if (isInserting) {
+      context.missing(_operatorOrderMeta);
     }
     if (data.containsKey('tags')) {
       context.handle(
@@ -589,6 +604,8 @@ class $TaskTable extends Task with TableInfo<$TaskTable, TaskData> {
           .read(DriftSqlType.int, data['${effectivePrefix}duration'])!,
       order: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}order']),
+      operatorOrder: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}operator_order'])!,
       tags: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}tags'])!,
       priority: attachedDatabase.typeMapping
@@ -624,6 +641,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final String part;
   final int duration;
   final int? order;
+  final int operatorOrder;
   final String tags;
   final int priority;
   final int costManHour;
@@ -641,6 +659,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       required this.part,
       required this.duration,
       this.order,
+      required this.operatorOrder,
       required this.tags,
       required this.priority,
       required this.costManHour,
@@ -662,6 +681,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     if (!nullToAbsent || order != null) {
       map['order'] = Variable<int>(order);
     }
+    map['operator_order'] = Variable<int>(operatorOrder);
     map['tags'] = Variable<String>(tags);
     map['priority'] = Variable<int>(priority);
     map['cost_man_hour'] = Variable<int>(costManHour);
@@ -694,6 +714,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       duration: Value(duration),
       order:
           order == null && nullToAbsent ? const Value.absent() : Value(order),
+      operatorOrder: Value(operatorOrder),
       tags: Value(tags),
       priority: Value(priority),
       costManHour: Value(costManHour),
@@ -723,6 +744,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       part: serializer.fromJson<String>(json['part']),
       duration: serializer.fromJson<int>(json['duration']),
       order: serializer.fromJson<int?>(json['order']),
+      operatorOrder: serializer.fromJson<int>(json['operatorOrder']),
       tags: serializer.fromJson<String>(json['tags']),
       priority: serializer.fromJson<int>(json['priority']),
       costManHour: serializer.fromJson<int>(json['costManHour']),
@@ -745,6 +767,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'part': serializer.toJson<String>(part),
       'duration': serializer.toJson<int>(duration),
       'order': serializer.toJson<int?>(order),
+      'operatorOrder': serializer.toJson<int>(operatorOrder),
       'tags': serializer.toJson<String>(tags),
       'priority': serializer.toJson<int>(priority),
       'costManHour': serializer.toJson<int>(costManHour),
@@ -765,6 +788,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           String? part,
           int? duration,
           Value<int?> order = const Value.absent(),
+          int? operatorOrder,
           String? tags,
           int? priority,
           int? costManHour,
@@ -782,6 +806,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
         part: part ?? this.part,
         duration: duration ?? this.duration,
         order: order.present ? order.value : this.order,
+        operatorOrder: operatorOrder ?? this.operatorOrder,
         tags: tags ?? this.tags,
         priority: priority ?? this.priority,
         costManHour: costManHour ?? this.costManHour,
@@ -802,6 +827,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('part: $part, ')
           ..write('duration: $duration, ')
           ..write('order: $order, ')
+          ..write('operatorOrder: $operatorOrder, ')
           ..write('tags: $tags, ')
           ..write('priority: $priority, ')
           ..write('costManHour: $costManHour, ')
@@ -824,6 +850,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       part,
       duration,
       order,
+      operatorOrder,
       tags,
       priority,
       costManHour,
@@ -844,6 +871,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.part == this.part &&
           other.duration == this.duration &&
           other.order == this.order &&
+          other.operatorOrder == this.operatorOrder &&
           other.tags == this.tags &&
           other.priority == this.priority &&
           other.costManHour == this.costManHour &&
@@ -863,6 +891,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
   final Value<String> part;
   final Value<int> duration;
   final Value<int?> order;
+  final Value<int> operatorOrder;
   final Value<String> tags;
   final Value<int> priority;
   final Value<int> costManHour;
@@ -880,6 +909,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     this.part = const Value.absent(),
     this.duration = const Value.absent(),
     this.order = const Value.absent(),
+    this.operatorOrder = const Value.absent(),
     this.tags = const Value.absent(),
     this.priority = const Value.absent(),
     this.costManHour = const Value.absent(),
@@ -898,6 +928,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     required String part,
     required int duration,
     this.order = const Value.absent(),
+    required int operatorOrder,
     required String tags,
     required int priority,
     required int costManHour,
@@ -912,6 +943,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
         schematicId = Value(schematicId),
         part = Value(part),
         duration = Value(duration),
+        operatorOrder = Value(operatorOrder),
         tags = Value(tags),
         priority = Value(priority),
         costManHour = Value(costManHour),
@@ -924,6 +956,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     Expression<String>? part,
     Expression<int>? duration,
     Expression<int>? order,
+    Expression<int>? operatorOrder,
     Expression<String>? tags,
     Expression<int>? priority,
     Expression<int>? costManHour,
@@ -942,6 +975,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       if (part != null) 'part': part,
       if (duration != null) 'duration': duration,
       if (order != null) 'order': order,
+      if (operatorOrder != null) 'operator_order': operatorOrder,
       if (tags != null) 'tags': tags,
       if (priority != null) 'priority': priority,
       if (costManHour != null) 'cost_man_hour': costManHour,
@@ -962,6 +996,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       Value<String>? part,
       Value<int>? duration,
       Value<int?>? order,
+      Value<int>? operatorOrder,
       Value<String>? tags,
       Value<int>? priority,
       Value<int>? costManHour,
@@ -979,6 +1014,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
       part: part ?? this.part,
       duration: duration ?? this.duration,
       order: order ?? this.order,
+      operatorOrder: operatorOrder ?? this.operatorOrder,
       tags: tags ?? this.tags,
       priority: priority ?? this.priority,
       costManHour: costManHour ?? this.costManHour,
@@ -1014,6 +1050,9 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
     }
     if (order.present) {
       map['order'] = Variable<int>(order.value);
+    }
+    if (operatorOrder.present) {
+      map['operator_order'] = Variable<int>(operatorOrder.value);
     }
     if (tags.present) {
       map['tags'] = Variable<String>(tags.value);
@@ -1055,6 +1094,7 @@ class TaskCompanion extends UpdateCompanion<TaskData> {
           ..write('part: $part, ')
           ..write('duration: $duration, ')
           ..write('order: $order, ')
+          ..write('operatorOrder: $operatorOrder, ')
           ..write('tags: $tags, ')
           ..write('priority: $priority, ')
           ..write('costManHour: $costManHour, ')
